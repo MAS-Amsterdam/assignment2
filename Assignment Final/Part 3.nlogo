@@ -33,9 +33,8 @@ end
 to go
   ; This method executes the main processing cycle of an agent.
   ; For Assignment 2, this only involves the execution of actions (and advancing the tick counter).
-  ; ifelse (stop_game = false)
   set dirt (count patches with [pcolor = grey])
-  if dirt = 0 [
+  if dirt = 0 [ ;if all the dirty cells have been cleaned then the simulation stops.
   show "game over"
   stop ]
   execute-actions
@@ -54,7 +53,6 @@ to setup-patches
 
   ask n-of (dirt_pct / 100 * (max-pxcor + 1) * (max-pycor + 1 )) patches [set pcolor grey]
   ask n-of (obs / 100 * width * height ) patches with [( pcolor = green ) and not ( pxcor = 0 ) and not ( pycor = 0 ) ]  [set pcolor black]
-
 end
 
 
@@ -66,8 +64,6 @@ to setup-turtles
   ask turtles [
     setxy 0 0 ; TODO: set the turtle at a location without obstercles
     facexy 0 1
-    ; face (min-one-of (patches with [pcolor = grey]) [distance myself])
-    ;set shape "wolf"
     ]
 end
 
@@ -86,11 +82,7 @@ to execute-actions
   ask turtles [
     ifelse pcolor = grey
     [set pcolor green]
-        ;if (count (patches with [pcolor = grey]) > 0)[
-        ;face (min-one-of (patches with [pcolor = grey]) [distance myself])]
-
-
-    [; other wise
+        [
      ifelse can-move? 1 [;if ahead is not an obstacle
 
      set is_obs false
@@ -98,11 +90,7 @@ to execute-actions
      ifelse (is_obs = false)
       [move-ahead-no-obs]
       [; if it is an obstacle
-       ;face (min-one-of (patches with [pcolor = grey]) [distance myself]); towards the direction of the dirt
-      right 90 + 180 * (random 2 )]; randomly turn left or right
-      ; TODO: This can be improved by turning towards the dirt
-      ;forward 1
-
+       right 90 + 180 * (random 2 )]; randomly turn left or right
       ]
       [; if ahead is an obstacle
       right 90 + 180 * (random 2 )]
@@ -110,65 +98,28 @@ to execute-actions
 
 
      ]
-    ;right random 360
-    ;forward 1
-    ;set steps (steps + 1)] ; find where the next dirt is, and set the direction towards that way.
 
 end
 
 
 to move-ahead-no-obs
   ; if ahead is not an obstacle
-       ; 80% of the chance, it will move ahead
+       ; 80% of the time, it will move ahead
        ifelse (random-float 1 < 0.8)
        [ forward 1
          set steps steps + 1]
        [; otherwise turn left or right randomly
          right 90 + 180 * (random 2 )]
 end
-
-
-
-
-
-
-
-;     --------------------------------------
-;      set left_no 0
-;      set right_no 0
-;
-;      ; test the left
-;      left 90 ;look left
-;      if can-move? 1 [
-;        ask patch-ahead 1 [
-;          if pcolor = grey [set left_no = left_no +1]
-;          ]
-;        ]
-;      right 180 ; look right
-;      if can-move? 1 [
-;        ask patch-ahead 1 [
-;          if pcolor = grey [set right_no = right +1]
-;          ]
-;        ]
-;      left 90 ; back to the original direction
-;
-;      if left_no > right_no [left 90]
-;      if right_no > left_no [right 90]
-;      if left_no = right_no [
-;        if (can-move? 1 and left_no = 0 and right_no = 0)[forward 1]
-;        if (not (can-move? 1) and left_no > 0 and right_no > 0)[tr 180]
-;        if (can-move? 1 and left_no > 0 and right_no > 0)[]
-;        if (can-move? 1 and left_no = 0 and right_no = 0)[]
-;        ]
 @#$#@#$#@
 GRAPHICS-WINDOW
 230
 10
 640
-441
+317
 -1
 -1
-22.22222222222222
+15.384615384615385
 1
 10
 1
@@ -179,7 +130,7 @@ GRAPHICS-WINDOW
 0
 1
 0
-17
+25
 0
 17
 1
@@ -257,7 +208,7 @@ width
 width
 0
 100
-18
+26
 1
 1
 NIL
@@ -287,7 +238,7 @@ obs
 obs
 0
 100
-15
+20
 1
 1
 NIL

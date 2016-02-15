@@ -17,11 +17,12 @@
 
 ; --- Global variables ---
 ; This template does not contain any global variables, but if you need them you can add them here.
-globals [stop_game dirt steps left_no right_no max_pxcor max_pycor is_obs]
+globals [dirt steps column]
 
 ; --- Setup ---
 to setup
   clear-all
+  set column 1
   set steps 0
   setup-patches
   setup-turtles
@@ -32,14 +33,10 @@ end
 ; --- Main processing cycle ---
 to go
   ; This method executes the main processing cycle of an agent.
-  ; For Assignment 2, this only involves the execution of actions (and advancing the tick counter).
-  ; ifelse (stop_game = false)
-  set dirt (count patches with [pcolor = grey])
-  if dirt = 0 [
-  show "game over"
-  stop ]
+  if steps >= (max-pxcor + 1) * (max-pycor + 1 ) - 1 and dirt = 0
+  [stop]
   execute-actions
-
+  set dirt (count patches with [pcolor = grey])
   tick
 
 end
@@ -47,13 +44,15 @@ end
 
 ; --- Setup patches ---
 to setup-patches
-  resize-world 0 ( width - 1) 0 ( height - 1)
-  set-patch-size ( 400 / width )
   ; In this method you may create the environment (patches), using colors to define dirty and cleaned cells.
-  ask patches [set pcolor green]
+  resize-world 0 ( width - 1) 0 ( hight - 1) ;setting world size to the user specified size
+  set-patch-size ( 400 / width ) ;adjusting patch size to the world size.
+  ask patches [
+    set pcolor green
+    ]
 
-  ask n-of (dirt_pct / 100 * (max-pxcor + 1) * (max-pycor + 1 )) patches [set pcolor grey]
-  ask n-of (obs / 100 * width * height ) patches with [( pcolor = green ) and not ( pxcor = 0 ) and not ( pycor = 0 ) ]  [set pcolor black]
+  ask n-of (dirt_pct / 100 * (max-pxcor + 1) * (max-pycor + 1 ))  patches [set pcolor grey]
+  ;set dirt dirt_pct
 
 end
 
@@ -61,13 +60,11 @@ end
 ; --- Setup turtles ---
 to setup-turtles
   ; In this method you may create the agents (in this case, there is only 1 agent).
-  create-turtles 1 [set color red]
+  create-turtles 1[set color red]
 
   ask turtles [
-    setxy 0 0 ; TODO: set the turtle at a location without obstercles
+    setxy 0 0
     facexy 0 1
-    ; face (min-one-of (patches with [pcolor = grey]) [distance myself])
-    ;set shape "wolf"
     ]
 end
 
@@ -83,105 +80,44 @@ end
 to execute-actions
   ; Here you should put the code related to the actions performed by your smart vacuum cleaner: moving and cleaning.
   ; You can separate these actions into two different methods if you want, but these methods should only be called from here!
+
   ask turtles [
     ifelse pcolor = grey
     [set pcolor green]
-        ;if (count (patches with [pcolor = grey]) > 0)[
-        ;face (min-one-of (patches with [pcolor = grey]) [distance myself])]
+    [
+     set steps ( steps + 1 )
+     ifelse steps / ( max-pycor + 1 ) < column
+    [forward 1 ]
+    [right 90 + 180 * (column - 1 )
+     set column (column + 1)
+     forward 1
+     right 90 + 180 * (column - 2 ) ]
 
-
-    [; other wise
-     ifelse can-move? 1 [;if ahead is not an obstacle
-
-     set is_obs false
-     ask (patch-ahead 1) [if pcolor = black [set is_obs true]]
-     ifelse (is_obs = false)
-      [move-ahead-no-obs]
-      [; if it is an obstacle
-       ;face (min-one-of (patches with [pcolor = grey]) [distance myself]); towards the direction of the dirt
-      right 90 + 180 * (random 2 )]; randomly turn left or right
-      ; TODO: This can be improved by turning towards the dirt
-      ;forward 1
-
-      ]
-      [; if ahead is an obstacle
-      right 90 + 180 * (random 2 )]
-      ]
-
-
-     ]
-    ;right random 360
-    ;forward 1
-    ;set steps (steps + 1)] ; find where the next dirt is, and set the direction towards that way.
-
+    ]
+    ]
 end
-
-
-to move-ahead-no-obs
-  ; if ahead is not an obstacle
-       ; 80% of the chance, it will move ahead
-       ifelse (random-float 1 < 0.8)
-       [ forward 1
-         set steps steps + 1]
-       [; otherwise turn left or right randomly
-         right 90 + 180 * (random 2 )]
-end
-
-
-
-
-
-
-
-;     --------------------------------------
-;      set left_no 0
-;      set right_no 0
-;
-;      ; test the left
-;      left 90 ;look left
-;      if can-move? 1 [
-;        ask patch-ahead 1 [
-;          if pcolor = grey [set left_no = left_no +1]
-;          ]
-;        ]
-;      right 180 ; look right
-;      if can-move? 1 [
-;        ask patch-ahead 1 [
-;          if pcolor = grey [set right_no = right +1]
-;          ]
-;        ]
-;      left 90 ; back to the original direction
-;
-;      if left_no > right_no [left 90]
-;      if right_no > left_no [right 90]
-;      if left_no = right_no [
-;        if (can-move? 1 and left_no = 0 and right_no = 0)[forward 1]
-;        if (not (can-move? 1) and left_no > 0 and right_no > 0)[tr 180]
-;        if (can-move? 1 and left_no > 0 and right_no > 0)[]
-;        if (can-move? 1 and left_no = 0 and right_no = 0)[]
-;        ]
 @#$#@#$#@
 GRAPHICS-WINDOW
-230
+265
 10
-640
-441
+675
+355
 -1
 -1
-22.22222222222222
+28.571428571428573
 1
 10
 1
 1
 1
 0
-0
-0
+1
+1
 1
 0
-17
+13
 0
-17
+10
 1
 1
 1
@@ -242,37 +178,33 @@ dirt_pct
 dirt_pct
 0
 100
-13
+49
 1
 1
 NIL
 HORIZONTAL
 
-SLIDER
-6
-166
-178
-199
-width
-width
-0
-100
-18
+MONITOR
+10
+158
+67
+203
+steps
+steps
+17
 1
-1
-NIL
-HORIZONTAL
+11
 
 SLIDER
-6
-212
-178
-245
-height
-height
+9
+219
+181
+252
+width
+width
 0
 100
-18
+14
 1
 1
 NIL
@@ -280,41 +212,27 @@ HORIZONTAL
 
 SLIDER
 9
-261
+269
 181
-294
-obs
-obs
+302
+hight
+hight
 0
 100
-15
+11
 1
 1
 NIL
 HORIZONTAL
 
-MONITOR
-24
-325
-81
-370
-Steps
-steps
-17
-1
-11
-
 @#$#@#$#@
 ## WHAT IS IT?
 
-The model shows a “Cleaning Robot” implemented in a environment called the ‘Vacuum World’ consisting of a grid of a nXm cells, with the presence of walls as obstacles. The goal is to clean up all the dusty cells covering the entire grid and stops once all the cells have been visited and cleaned.
+The model shows a “Cleaning Robot” implemented in a environment called the ‘Vacuum World’ consisting of a grid of a nXm cells. The goal is to clean up all the dusty cells following a sequence hard-coded commands covering the entire grid and stops once all the cells have been visited and cleaned.
 
 ## HOW IT WORKS
 
-The agent checks if the cell ahead is a accessible (with or without dirt), then:
-	In 80% of the cases the agent goes to the cell
-	In 20% of the cases the agent either turns randomly left or right
-The agent then checks if the cell is clean or dirty, depending on which it cleans the cell by setting the colour to green. Running this long enough, results in all the reachable cells being cleaned.
+The agent starts from position (0,0) and goes up the column till the end and then turns right and moves a step forward and comes down the column. This pattern is repeated over until the end of the grid is reached by the agent. For each cell, the agent checks whether the cell is dirty, which is represented by the colour grey. If it finds dirt, it cleans it up by setting the cell to green.
 
 ## HOW TO USE IT
 

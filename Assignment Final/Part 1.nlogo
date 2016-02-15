@@ -17,11 +17,12 @@
 
 ; --- Global variables ---
 ; This template does not contain any global variables, but if you need them you can add them here.
-globals [stop_game dirt steps left_no right_no max_pxcor max_pycor is_obs]
+globals [dirt steps column]
 
 ; --- Setup ---
 to setup
   clear-all
+  set column 1
   set steps 0
   setup-patches
   setup-turtles
@@ -32,14 +33,10 @@ end
 ; --- Main processing cycle ---
 to go
   ; This method executes the main processing cycle of an agent.
-  ; For Assignment 2, this only involves the execution of actions (and advancing the tick counter).
-  ; ifelse (stop_game = false)
-  set dirt (count patches with [pcolor = grey])
-  if dirt = 0 [
-  show "game over"
-  stop ]
+  if steps >= (max-pxcor + 1) * (max-pycor + 1 ) - 1 and dirt = 0 ;checks whether all cells has been traversed and the dust cleaned.
+  [stop]
   execute-actions
-
+  set dirt (count patches with [pcolor = grey]) ;updates the dirt count
   tick
 
 end
@@ -47,13 +44,13 @@ end
 
 ; --- Setup patches ---
 to setup-patches
-  resize-world 0 ( width - 1) 0 ( height - 1)
-  set-patch-size ( 400 / width )
   ; In this method you may create the environment (patches), using colors to define dirty and cleaned cells.
-  ask patches [set pcolor green]
+  ask patches [
+    set pcolor green
+    ]
 
-  ask n-of (dirt_pct / 100 * (max-pxcor + 1) * (max-pycor + 1 )) patches [set pcolor grey]
-  ask n-of (obs / 100 * width * height ) patches with [( pcolor = green ) and not ( pxcor = 0 ) and not ( pycor = 0 ) ]  [set pcolor black]
+  ask n-of (dirt_pct / 100 * (max-pxcor + 1) * (max-pycor + 1 ))  patches [set pcolor grey] ;The dirty set are randomly set based on the percentage
+  ;set dirt dirt_pct
 
 end
 
@@ -61,13 +58,11 @@ end
 ; --- Setup turtles ---
 to setup-turtles
   ; In this method you may create the agents (in this case, there is only 1 agent).
-  create-turtles 1 [set color red]
+  create-turtles 1[set color red]
 
   ask turtles [
-    setxy 0 0 ; TODO: set the turtle at a location without obstercles
+    setxy 0 0
     facexy 0 1
-    ; face (min-one-of (patches with [pcolor = grey]) [distance myself])
-    ;set shape "wolf"
     ]
 end
 
@@ -83,105 +78,44 @@ end
 to execute-actions
   ; Here you should put the code related to the actions performed by your smart vacuum cleaner: moving and cleaning.
   ; You can separate these actions into two different methods if you want, but these methods should only be called from here!
+
   ask turtles [
     ifelse pcolor = grey
-    [set pcolor green]
-        ;if (count (patches with [pcolor = grey]) > 0)[
-        ;face (min-one-of (patches with [pcolor = grey]) [distance myself])]
+    [set pcolor green] ;cleans dust if dirt found
+    [
+     set steps ( steps + 1 )
+     ifelse steps / ( max-pycor + 1 ) < column ;moves forward if not border
+    [forward 1 ]
+    [right 90 + 180 * (column - 1 ) ;turns
+     set column (column + 1)
+     forward 1 ;moves forward if not border
+     right 90 + 180 * (column - 2 ) ] ;turns
 
-
-    [; other wise
-     ifelse can-move? 1 [;if ahead is not an obstacle
-
-     set is_obs false
-     ask (patch-ahead 1) [if pcolor = black [set is_obs true]]
-     ifelse (is_obs = false)
-      [move-ahead-no-obs]
-      [; if it is an obstacle
-       ;face (min-one-of (patches with [pcolor = grey]) [distance myself]); towards the direction of the dirt
-      right 90 + 180 * (random 2 )]; randomly turn left or right
-      ; TODO: This can be improved by turning towards the dirt
-      ;forward 1
-
-      ]
-      [; if ahead is an obstacle
-      right 90 + 180 * (random 2 )]
-      ]
-
-
-     ]
-    ;right random 360
-    ;forward 1
-    ;set steps (steps + 1)] ; find where the next dirt is, and set the direction towards that way.
-
+    ]
+    ]
 end
-
-
-to move-ahead-no-obs
-  ; if ahead is not an obstacle
-       ; 80% of the chance, it will move ahead
-       ifelse (random-float 1 < 0.8)
-       [ forward 1
-         set steps steps + 1]
-       [; otherwise turn left or right randomly
-         right 90 + 180 * (random 2 )]
-end
-
-
-
-
-
-
-
-;     --------------------------------------
-;      set left_no 0
-;      set right_no 0
-;
-;      ; test the left
-;      left 90 ;look left
-;      if can-move? 1 [
-;        ask patch-ahead 1 [
-;          if pcolor = grey [set left_no = left_no +1]
-;          ]
-;        ]
-;      right 180 ; look right
-;      if can-move? 1 [
-;        ask patch-ahead 1 [
-;          if pcolor = grey [set right_no = right +1]
-;          ]
-;        ]
-;      left 90 ; back to the original direction
-;
-;      if left_no > right_no [left 90]
-;      if right_no > left_no [right 90]
-;      if left_no = right_no [
-;        if (can-move? 1 and left_no = 0 and right_no = 0)[forward 1]
-;        if (not (can-move? 1) and left_no > 0 and right_no > 0)[tr 180]
-;        if (can-move? 1 and left_no > 0 and right_no > 0)[]
-;        if (can-move? 1 and left_no = 0 and right_no = 0)[]
-;        ]
 @#$#@#$#@
 GRAPHICS-WINDOW
-230
+210
 10
-640
-441
+455
+239
 -1
 -1
-22.22222222222222
+66.0
 1
 10
 1
 1
 1
 0
-0
-0
+1
+1
 1
 0
-17
+2
 0
-17
+2
 1
 1
 1
@@ -242,63 +176,18 @@ dirt_pct
 dirt_pct
 0
 100
-13
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-6
-166
-178
-199
-width
-width
-0
-100
-18
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-6
-212
-178
-245
-height
-height
-0
-100
-18
-1
-1
-NIL
-HORIZONTAL
-
-SLIDER
-9
-261
-181
-294
-obs
-obs
-0
-100
-15
+34
 1
 1
 NIL
 HORIZONTAL
 
 MONITOR
-24
-325
-81
-370
-Steps
+10
+158
+67
+203
+steps
 steps
 17
 1
@@ -307,28 +196,22 @@ steps
 @#$#@#$#@
 ## WHAT IS IT?
 
-The model shows a “Cleaning Robot” implemented in a environment called the ‘Vacuum World’ consisting of a grid of a nXm cells, with the presence of walls as obstacles. The goal is to clean up all the dusty cells covering the entire grid and stops once all the cells have been visited and cleaned.
+The model shows a "Cleaning Robot" implemented in a environment called the 'Vacuum World' consisting of a grid of a 3X3 cells. The goal is to clean up all the dusty cells following a sequence hard-coded commands covering the entire and stops at the position (2,2).
 
 ## HOW IT WORKS
 
-The agent checks if the cell ahead is a accessible (with or without dirt), then:
-	In 80% of the cases the agent goes to the cell
-	In 20% of the cases the agent either turns randomly left or right
-The agent then checks if the cell is clean or dirty, depending on which it cleans the cell by setting the colour to green. Running this long enough, results in all the reachable cells being cleaned.
+The agent starts from position (0,0), it travels up till it reaches the position (0,2) and turns 90 degrees to the right and steps forward. It then travels down till it reaches (1,0) and then turns 90 degrees to the left and moves forward. It then moves up till it reaches (2,2), where it stops. This way the agent covers the entire grid.
+For each cell, the agent checks whether the cell is dirty, which is represented by the colour grey. If it finds dirt, it cleans it up by setting the cell to green.
 
 ## HOW TO USE IT
 
-Slider dirt_pct: Sets the dirt percent for the world Button setup: Sets up the world with the initial values defined in the function setup Button go: This triggers the agent code to run.
-
-Slider width: Sets the width of the grid.
-
-Slider height: Sets the height of the grid.
+Slider dirt_pct: Sets the dirt percent for the world
+Button setup: Sets up the world with the initial values defined in the function setup
+Button go: This triggers the agent code to run.
 
 1) Set the dirt percent with the slider.
-2) Set the height of the grid with the slider.
-3) Set the width of the grid with the slider.
-4) Setup the world with the setup button.
-5) Execute the model by pressing the go button.
+2) Setup the world with the setup button.
+3) Execute the model by pressing the go button.
 
 ## THINGS TO NOTICE
 
@@ -337,7 +220,6 @@ The number of dirty cells left is tracked on the monitor labelled dirt. The numb
 ## THINGS TO TRY
 
 The dirt percentage can be modified by using the slider labelled dirt_pct.
-The grid height and the width can be modified by using the slider labelled heigth and width, respectively.
 
 ## CREDITS
 

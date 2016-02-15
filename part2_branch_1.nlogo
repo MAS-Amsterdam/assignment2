@@ -46,12 +46,12 @@ end
 to setup-patches
   ; In this method you may create the environment (patches), using colors to define dirty and cleaned cells.
   resize-world 0 ( width - 1) 0 ( hight - 1)
-  set-patch-size ( 600 / width )
+  set-patch-size ( 400 / width )
   ask patches [
     set pcolor green
     ]
 
-  ask n-of (dirt_pct * (max-pxcor + 1) * (max-pycor + 1 ))  patches [set pcolor grey]
+  ask n-of (dirt_pct / 100 * (max-pxcor + 1) * (max-pycor + 1 ))  patches [set pcolor grey]
   ;set dirt dirt_pct
 
 end
@@ -101,13 +101,13 @@ to execute-actions
 end
 @#$#@#$#@
 GRAPHICS-WINDOW
-210
+265
 10
-820
-1241
+675
+441
 -1
 -1
-33.333333333333336
+8.0
 1
 10
 1
@@ -118,9 +118,9 @@ GRAPHICS-WINDOW
 1
 1
 0
-17
+49
 0
-35
+49
 1
 1
 1
@@ -180,9 +180,9 @@ SLIDER
 dirt_pct
 dirt_pct
 0
+100
+49
 1
-1
-0.05
 1
 NIL
 HORIZONTAL
@@ -207,7 +207,7 @@ width
 width
 0
 100
-18
+50
 1
 1
 NIL
@@ -222,7 +222,7 @@ hight
 hight
 0
 100
-36
+50
 1
 1
 NIL
@@ -231,39 +231,40 @@ HORIZONTAL
 @#$#@#$#@
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
+The model shows a “Cleaning Robot” implemented in a environment called the ‘Vacuum World’ consisting of a grid of a nXm cells. The goal is to clean up all the dusty cells following a sequence hard-coded commands covering the entire grid and stops once all the cells have been visited and cleaned.
 
 ## HOW IT WORKS
 
-(what rules the agents use to create the overall behavior of the model)
+The agent starts from position (0,0) and goes up the column till the end and then turns right and moves a step forward and comes down the column. This pattern is repeated over until the end of the grid is reached by the agent. For each cell, the agent checks whether the cell is dirty, which is represented by the colour grey. If it finds dirt, it cleans it up by setting the cell to green.
 
 ## HOW TO USE IT
 
-(how to use the model, including a description of each of the items in the Interface tab)
+Slider dirt_pct: Sets the dirt percent for the world Button setup: Sets up the world with the initial values defined in the function setup Button go: This triggers the agent code to run.
+
+Slider width: Sets the width of the grid.
+
+Slider height: Sets the height of the grid.
+
+1) Set the dirt percent with the slider.
+2) Set the height of the grid with the slider.
+3) Set the width of the grid with the slider.
+4) Setup the world with the setup button.
+5) Execute the model by pressing the go button.
 
 ## THINGS TO NOTICE
 
-(suggested things for the user to notice while running the model)
+The number of dirty cells left is tracked on the monitor labelled dirt. The number of steps is tracked, similarly, by the monitor labelled steps.
 
 ## THINGS TO TRY
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+The dirt percentage can be modified by using the slider labelled dirt_pct.
+The grid height and the width can be modified by using the slider labelled heigth and width, respectively.
 
-## EXTENDING THE MODEL
+## CREDITS
 
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
-
-## NETLOGO FEATURES
-
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
-
-## RELATED MODELS
-
-(models in the NetLogo Models Library and elsewhere which are of related interest)
-
-## CREDITS AND REFERENCES
-
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+Shuai Wang (11108339)
+Kaixin Hu  (11129417)
+Partha Das (11137053)
 @#$#@#$#@
 default
 true

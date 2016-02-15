@@ -49,7 +49,7 @@ to setup-patches
     set pcolor green
     ]
 
-  ask n-of (dirt_pct * (max-pxcor + 1) * (max-pycor + 1 ))  patches [set pcolor grey]
+  ask n-of (dirt_pct / 100 * (max-pxcor + 1) * (max-pycor + 1 ))  patches [set pcolor grey]
   ;set dirt dirt_pct
 
 end
@@ -178,9 +178,9 @@ SLIDER
 dirt_pct
 dirt_pct
 0
+100
+34
 1
-0.62
-0.01
 1
 NIL
 HORIZONTAL
@@ -199,39 +199,36 @@ steps
 @#$#@#$#@
 ## WHAT IS IT?
 
-(a general understanding of what the model is trying to show or explain)
+The model shows a "Cleaning Robot" implemented in a environment called the 'Vacuum World' consisting of a grid of a 3X3 cells. The goal is to clean up all the dusty cells following a sequence hard-coded commands covering the entire and stops at the position (2,2).
 
 ## HOW IT WORKS
 
-(what rules the agents use to create the overall behavior of the model)
+The agent starts from position (0,0), it travels up till it reaches the position (0,2) and turns 90 degrees to the right and steps forward. It then travels down till it reaches (1,0) and then turns 90 degrees to the left and moves forward. It then moves up till it reaches (2,2), where it stops. This way the agent covers the entire grid.
+For each cell, the agent checks whether the cell is dirty, which is represented by the colour grey. If it finds dirt, it cleans it up by setting the cell to green.
 
 ## HOW TO USE IT
 
-(how to use the model, including a description of each of the items in the Interface tab)
+Slider dirt_pct: Sets the dirt percent for the world
+Button setup: Sets up the world with the initial values defined in the function setup
+Button go: This triggers the agent code to run.
+
+1) Set the dirt percent with the slider.
+2) Setup the world with the setup button.
+3) Execute the model by pressing the go button.
 
 ## THINGS TO NOTICE
 
-(suggested things for the user to notice while running the model)
+The number of dirty cells left is tracked on the monitor labelled dirt. The number of steps is tracked, similarly, by the monitor labelled steps.
 
 ## THINGS TO TRY
 
-(suggested things for the user to try to do (move sliders, switches, etc.) with the model)
+The dirt percentage can be modified by using the slider labelled dirt_pct.
 
-## EXTENDING THE MODEL
+## CREDITS
 
-(suggested things to add or change in the Code tab to make the model more complicated, detailed, accurate, etc.)
-
-## NETLOGO FEATURES
-
-(interesting or unusual features of NetLogo that the model uses, particularly in the Code tab; or where workarounds were needed for missing features)
-
-## RELATED MODELS
-
-(models in the NetLogo Models Library and elsewhere which are of related interest)
-
-## CREDITS AND REFERENCES
-
-(a reference to the model's URL on the web if it has one, as well as any other necessary credits, citations, and links)
+Shuai Wang (11108339)
+Kaixin Hu  (11129417)
+Partha Das (11137053)
 @#$#@#$#@
 default
 true
